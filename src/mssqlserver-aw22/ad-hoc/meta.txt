@@ -1,0 +1,46 @@
+Instance Name:
+MSSQLSERVER
+
+Connection String:
+Server=localhost;Database=master;Trusted_Connection=True;
+
+Sql Administrators:
+DESKTOP-6SOBJNP\Rachit
+
+Version:
+16.0.1000.6, RTM
+
+sqlcmd -S DESKTOP-6SOBJNP -E
+
+Server Name: DESKTOP-6SOBJNP
+
+User Name: sqluser1
+Pwd: mpssp
+
+sqluser1-pwd
+adventureworks-22-proj-adf
+f226bff9-204e-4bb0-8cf6-76a0d8eecf49
+
+--------------------------
+
+AdventureWorks2022
+LastRunTimestamp
+Sales
+ShoppingCartItem
+
+UPDATE  [dbo].[TableMetadata] SET LastRunTimestamp = '2013-11-08' 
+WHERE SourceSchema = 'Sales' AND SourceTable = 'ShoppingCartItem'
+
+SELECT * FROM [dbo].[TableMetadata]
+
+
+INSERT INTO dbo.TableMetadata
+(
+    SourceSystem, SourceType, SourceConnection,
+    SourceSchema, SourceTable,
+    TargetSystem, TargetType, TargetConnection, TargetFilePath,
+    IsActive, LastRunTimestamp
+)
+VALUES
+-- Sales tables
+('Database', 'OnPremSQL', 'ln_SqlServer_AW22', 'Sales', 'ShoppingCartItem', 'ADLS_Gen2', 'Files', 'LS_Gen2', '/Raw/Sales/ShoppingCartItem/', 1, '2013-11-10')
