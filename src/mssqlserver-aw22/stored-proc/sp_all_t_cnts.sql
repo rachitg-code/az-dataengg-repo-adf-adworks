@@ -24,13 +24,6 @@ BEGIN
         cnt int
     );
 
-    -- Insert data into the table variable
-    
-    /*VALUES (1, 'Item A', 100.50),
-           (2, 'Item B', 200.75),
-           (3, 'Item C', 300.00);
-           */
-
     -- Open the cursor
     OPEN myCursor;
 

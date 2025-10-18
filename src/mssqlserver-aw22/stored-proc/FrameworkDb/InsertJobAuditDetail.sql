@@ -6,6 +6,7 @@ GO
 CREATE PROCEDURE dbo.InsertJobAuditDetail
 (
     @MetadataId INT = NULL,
+    @ParentAuditId INT = NULL,
     @PipelineName NVARCHAR(200),
     @ActivityName NVARCHAR(200),
     @RunId NVARCHAR(100),
@@ -27,9 +28,10 @@ CREATE PROCEDURE dbo.InsertJobAuditDetail
     @ErrorMessage NVARCHAR(MAX) = NULL,
 
     -- Timestamps
+    @WaterMarkPrevious DATETIME = NULL,
+    @WaterMarkCurrent DATETIME = NULL,
     @StartTime DATETIME,
-    @EndTime DATETIME,
-    @oAuditId INT OUTPUT
+    @EndTime DATETIME
 )
 AS
 BEGIN
@@ -41,7 +43,7 @@ BEGIN
         SourceSystem, SourceTable, SourceFilePath,
         TargetSystem, TargetTable, TargetFilePath,
         RowsCopied, CopyDurationSeconds, Status, ErrorMessage,
-        StartTime, EndTime
+        StartTime, EndTime, ParentAuditId, WaterMarkPrevious, WaterMarkCurrent
     )
     VALUES
     (
@@ -49,9 +51,9 @@ BEGIN
         @SourceSystem, @SourceTable, @SourceFilePath,
         @TargetSystem, @TargetTable, @TargetFilePath,
         @RowsCopied, @CopyDurationSeconds, @Status, @ErrorMessage,
-        @StartTime, @EndTime
+        @StartTime, @EndTime, @ParentAuditId, @WaterMarkPrevious, @WaterMarkCurrent
     );
 
-    SELECT @oAuditId=SCOPE_IDENTITY();
-    RETURN @oAuditId;
+    SELECT CAST(SCOPE_IDENTITY() AS INT) AS oAuditId;
+
 END;
