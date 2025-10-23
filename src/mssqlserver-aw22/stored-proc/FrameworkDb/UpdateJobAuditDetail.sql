@@ -13,8 +13,6 @@ CREATE PROCEDURE dbo.UpdateJobAuditDetail
     , @pStatus NVARCHAR(50) = NULL
     , @pErrorMessage NVARCHAR(MAX) = NULL
     , @pMetadataId INT
-    , @pSourceFilePath NVARCHAR(500) = NULL
-    , @pSourceSystem NVARCHAR(200) = NULL
     , @pTargetFilePath NVARCHAR(500) = NULL
     , @pTargetSystem NVARCHAR(200) = NULL
     , @pTargetTable NVARCHAR(200) = NULL
@@ -33,8 +31,6 @@ BEGIN
     , EndTime = @pEndTime
     , ErrorMessage = @pErrorMessage
     , MetadataId = @pMetadataId
-    , SourceFilePath = @pSourceFilePath
-    , SourceSystem = @pSourceSystem
     , TargetFilePath = @pTargetFilePath
     , TargetSystem = @pTargetSystem
     , TargetTable = @pTargetTable

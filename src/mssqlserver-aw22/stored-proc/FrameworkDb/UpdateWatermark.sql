@@ -13,7 +13,7 @@ BEGIN
     SET NOCOUNT ON;
 
     UPDATE dbo.TableMetadata
-    SET LastRunTimestamp = @pLastRunTime
+    SET LastRunTimestamp = @pLastRunTime, ModifiedOn = GETDATE()
     WHERE Id = @pMetaId;
 
     RETURN 0;

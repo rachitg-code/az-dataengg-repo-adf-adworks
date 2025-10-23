@@ -1,9 +1,12 @@
 CREATE TABLE dbo.job_audit_detail (
     AuditId INT IDENTITY(1,1) PRIMARY KEY,
+    ParentAuditId INT NULL,               -- for hierarchical jobs if needed
 
     -- Reference info (but no FK constraint)
     MetadataId INT NULL,                    
     SourceSystem NVARCHAR(100),
+    SourceContainer NVARCHAR(200),
+    SourceSchema NVARCHAR(100),
     SourceTable NVARCHAR(200),
     SourceFilePath NVARCHAR(500),
 
@@ -22,7 +25,6 @@ CREATE TABLE dbo.job_audit_detail (
     Status NVARCHAR(50) NOT NULL,           -- e.g., 'Success' / 'Failed'
     WaterMarkPrevious DATETIME NULL,
     WaterMarkCurrent DATETIME NULL,
-    ParentAuditId INT NULL,               -- for hierarchical jobs if needed
 
     ErrorMessage NVARCHAR(MAX) NULL,
 
