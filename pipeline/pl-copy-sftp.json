@@ -1,0 +1,381 @@
+{
+	"name": "pl-copy-sftp",
+	"properties": {
+		"activities": [
+			{
+				"name": "copy-sftp",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "init-audit-meta",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "BinarySource",
+						"storeSettings": {
+							"type": "SftpReadSettings",
+							"maxConcurrentConnections": 10,
+							"recursive": true,
+							"wildcardFileName": "*.png",
+							"deleteFilesAfterCompletion": false,
+							"disableChunking": false
+						},
+						"formatSettings": {
+							"type": "BinaryReadSettings"
+						}
+					},
+					"sink": {
+						"type": "BinarySink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings",
+							"maxConcurrentConnections": 10
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_sftp_rebex",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_adls_as22_binary",
+						"type": "DatasetReference",
+						"parameters": {
+							"p_base_container": {
+								"value": "@variables('v_base_container')",
+								"type": "Expression"
+							},
+							"p_folder_path": {
+								"value": "@variables('v_folder')",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "set-error-copy-sftp",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "copy-sftp",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-error-log",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"p_activity_name": "copy-sftp",
+						"p_audit_id": {
+							"value": "@activity('init-audit-meta').output.pipelineReturnValue.oAuditId",
+							"type": "Expression"
+						},
+						"p_error_message": {
+							"value": "@activity('copy-sftp').error.message",
+							"type": "Expression"
+						},
+						"p_target_file_path": {
+							"value": "@activity('init-audit-meta').output.pipelineReturnValue.oTargetFilePath",
+							"type": "Expression"
+						},
+						"p_target_system": {
+							"value": "@activity('init-audit-meta').output.pipelineReturnValue.oTargetSystem",
+							"type": "Expression"
+						},
+						"p_target_table": {
+							"value": "@activity('init-audit-meta').output.pipelineReturnValue.oTargetTable",
+							"type": "Expression"
+						},
+						"p_water_mark_current": {
+							"value": "@activity('init-audit-meta').output.pipelineReturnValue.oRunStart",
+							"type": "Expression"
+						},
+						"p_water_mark_previous": {
+							"value": "@activity('init-audit-meta').output.pipelineReturnValue.oLastRunTimestamp",
+							"type": "Expression"
+						},
+						"p_metadata_id": {
+							"value": "@activity('init-audit-meta').output.pipelineReturnValue.oMetadataId",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "update-watermark",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "copy-sftp",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[UpdateWatermark]",
+					"storedProcedureParameters": {
+						"pLastRunTime": {
+							"value": {
+								"value": "@activity('init-audit-meta').output.pipelineReturnValue.oRunStart",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"pMetaId": {
+							"value": {
+								"value": "@activity('init-audit-meta').output.pipelineReturnValue.oMetadataId",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ln_SqlServer_AW22",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"sqldb": {
+							"value": "@variables('v_framework_db')",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "set-error-wm-upd",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "update-watermark",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-error-log",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"p_activity_name": "update-watermark",
+						"p_audit_id": {
+							"value": "@activity('init-audit-meta').output.pipelineReturnValue.oAuditId",
+							"type": "Expression"
+						},
+						"p_copy_duration_seconds": {
+							"value": "@activity('copy-sftp').output.copyDuration",
+							"type": "Expression"
+						},
+						"p_error_message": {
+							"value": "@activity('update-watermark').error.message",
+							"type": "Expression"
+						},
+						"p_rows_copied": {
+							"value": "@activity('copy-sftp').output.filesWritten",
+							"type": "Expression"
+						},
+						"p_target_file_path": {
+							"value": "@activity('init-audit-meta').output.pipelineReturnValue.oTargetFilePath",
+							"type": "Expression"
+						},
+						"p_target_system": {
+							"value": "@activity('init-audit-meta').output.pipelineReturnValue.oTargetSystem",
+							"type": "Expression"
+						},
+						"p_target_table": {
+							"value": "@activity('init-audit-meta').output.pipelineReturnValue.oTargetTable",
+							"type": "Expression"
+						},
+						"p_water_mark_current": {
+							"value": "@activity('init-audit-meta').output.pipelineReturnValue.oRunStart",
+							"type": "Expression"
+						},
+						"p_water_mark_previous": {
+							"value": "@activity('init-audit-meta').output.pipelineReturnValue.oLastRunTimestamp",
+							"type": "Expression"
+						},
+						"p_metadata_id": {
+							"value": "@activity('init-audit-meta').output.pipelineReturnValue.oMetadataId",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "init-audit-meta",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_init_metad",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"p_source_system": {
+							"value": "@variables('v_source_system')",
+							"type": "Expression"
+						},
+						"p_source_container": {
+							"value": "@pipeline().parameters.p_source_container",
+							"type": "Expression"
+						},
+						"p_audit_id_parent": {
+							"value": "@pipeline().parameters.p_audit_id_parent",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "set-audit-success",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "update-watermark",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-audit-success",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"p_activity_name": "copy-sftp",
+						"p_audit_id": {
+							"value": "@activity('init-audit-meta').output.pipelineReturnValue.oAuditId",
+							"type": "Expression"
+						},
+						"p_copy_duration_seconds": {
+							"value": "@activity('copy-sftp').output.copyDuration",
+							"type": "Expression"
+						},
+						"p_end_time": {
+							"value": "@utcNow()",
+							"type": "Expression"
+						},
+						"p_metadata_id": {
+							"value": "@activity('init-audit-meta').output.pipelineReturnValue.oMetadataId",
+							"type": "Expression"
+						},
+						"p_rows_copied": {
+							"value": "@activity('copy-sftp').output.filesWritten",
+							"type": "Expression"
+						},
+						"p_status": {
+							"value": "@variables('v_success_status')",
+							"type": "Expression"
+						},
+						"p_target_file_path": {
+							"value": "@activity('init-audit-meta').output.pipelineReturnValue.oTargetFilePath",
+							"type": "Expression"
+						},
+						"p_target_system": {
+							"value": "@activity('init-audit-meta').output.pipelineReturnValue.oTargetSystem",
+							"type": "Expression"
+						},
+						"p_target_table": {
+							"value": "@activity('init-audit-meta').output.pipelineReturnValue.oTargetTable",
+							"type": "Expression"
+						},
+						"p_water_mark_current": {
+							"value": "@activity('init-audit-meta').output.pipelineReturnValue.oRunStart",
+							"type": "Expression"
+						},
+						"p_water_mark_previous": {
+							"value": "@activity('init-audit-meta').output.pipelineReturnValue.oLastRunTimestamp",
+							"type": "Expression"
+						}
+					}
+				}
+			}
+		],
+		"parameters": {
+			"p_source_container": {
+				"type": "string",
+				"defaultValue": "sftp_testrebex"
+			},
+			"p_audit_id_parent": {
+				"type": "int",
+				"defaultValue": 0
+			}
+		},
+		"variables": {
+			"v_base_container": {
+				"type": "String",
+				"defaultValue": "landing"
+			},
+			"v_folder": {
+				"type": "String",
+				"defaultValue": "sftp_source"
+			},
+			"v_framework_db": {
+				"type": "String",
+				"defaultValue": "FrameworkDb"
+			},
+			"v_success_status": {
+				"type": "String",
+				"defaultValue": "Succeeded"
+			},
+			"v_source_system": {
+				"type": "String",
+				"defaultValue": "Sftp"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-10-21T09:14:25Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

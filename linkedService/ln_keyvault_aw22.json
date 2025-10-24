@@ -1,0 +1,11 @@
+{
+	"name": "ln_keyvault_aw22",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://kv-dataengg-proj-aw22.vault.azure.net/"
+		}
+	}
+}

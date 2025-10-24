@@ -1,0 +1,43 @@
+{
+	"name": "ds_sql_server_aw22_onprem_home",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ln_SqlServer_AW22",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"sqldb": {
+					"value": "@dataset().sqlDb",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"sqlTable": {
+				"type": "string",
+				"defaultValue": "TableMetadata"
+			},
+			"sqlSchema": {
+				"type": "string",
+				"defaultValue": "dbo"
+			},
+			"sqlDb": {
+				"type": "string",
+				"defaultValue": "FrameworkDb"
+			}
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().sqlSchema",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().sqlTable",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

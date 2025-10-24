@@ -1,0 +1,34 @@
+{
+	"name": "ln_SqlServer_AW22",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"parameters": {
+			"sqldb": {
+				"type": "string",
+				"defaultValue": "FrameworkDb"
+			}
+		},
+		"annotations": [],
+		"type": "SqlServer",
+		"typeProperties": {
+			"server": "DESKTOP-6SOBJNP",
+			"database": "@{linkedService().sqldb}",
+			"encrypt": "optional",
+			"trustServerCertificate": true,
+			"authenticationType": "SQL",
+			"userName": "sqluser1",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "ln_keyvault_aw22",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "sqluser1-pwd"
+			}
+		},
+		"connectVia": {
+			"referenceName": "aw-22-sh-ir",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

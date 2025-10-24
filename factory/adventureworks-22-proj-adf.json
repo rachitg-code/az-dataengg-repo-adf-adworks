@@ -1,0 +1,9 @@
+{
+	"name": "adventureworks-22-proj-adf",
+	"location": "southindia",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "f226bff9-204e-4bb0-8cf6-76a0d8eecf49",
+		"tenantId": "d0ac077e-3620-4e71-af7e-06cceaf2b4d4"
+	}
+}

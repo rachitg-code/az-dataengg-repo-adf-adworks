@@ -1,0 +1,11 @@
+{
+	"name": "ln_Adls_AW22",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://adventureworks22dl.dfs.core.windows.net/"
+		}
+	}
+}

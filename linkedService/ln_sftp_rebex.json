@@ -1,0 +1,24 @@
+{
+	"name": "ln_sftp_rebex",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "Sftp",
+		"typeProperties": {
+			"host": "test.rebex.net",
+			"port": 22,
+			"skipHostKeyValidation": false,
+			"hostKeyFingerprint": "ssh-ed25519 32 e7:e4:45:c6:b8:e4:bb:d8:68:89:27:86:fd:01:58:f0",
+			"authenticationType": "Basic",
+			"userName": "demo",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "ln_keyvault_aw22",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "rebex-pwd"
+			}
+		}
+	}
+}

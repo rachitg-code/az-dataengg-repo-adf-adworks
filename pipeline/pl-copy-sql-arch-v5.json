@@ -1,0 +1,747 @@
+{
+	"name": "pl-copy-sql-arch-v5",
+	"properties": {
+		"activities": [
+			{
+				"name": "set-file-name",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "set-prev-watermark",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "v_file",
+					"value": {
+						"value": "@concat(pipeline().parameters.p_table,'-',replace(replace(variables('v_run_start'), ' ', '_'),':','-'),'.csv')\n\n\n",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "get-new-watermark",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "set-file-name",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderQuery": {
+							"value": "@concat('SELECT MAX(ModifiedDate) AS wm_new FROM ',pipeline().parameters.p_schema,'.',pipeline().parameters.p_table,' WHERE ModifiedDate > ''',activity('init-audit-meta').output.pipelineReturnValue.oLastRunTimestamp, '''')",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_sql_server_aw22_onprem_home",
+						"type": "DatasetReference",
+						"parameters": {
+							"sqlTable": {
+								"value": "@pipeline().parameters.p_table",
+								"type": "Expression"
+							},
+							"sqlSchema": {
+								"value": "@pipeline().parameters.p_schema",
+								"type": "Expression"
+							},
+							"sqlDb": "@pipeline().parameters.p_db"
+						}
+					}
+				}
+			},
+			{
+				"name": "if-new-data",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "get-new-watermark",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@not(equals(coalesce(activity('get-new-watermark').output.firstRow.wm_new, ''), ''))\n",
+						"type": "Expression"
+					},
+					"ifTrueActivities": [
+						{
+							"name": "copy-sql",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"sqlReaderQuery": {
+										"value": "@concat('SELECT * FROM ',pipeline().parameters.p_schema,'.',pipeline().parameters.p_table,' WHERE ModifiedDate BETWEEN ''',variables('v_old_wm'),''' AND ''',activity('get-new-watermark').output.firstRow.wm_new, '''')",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_sql_server_aw22_onprem_home",
+									"type": "DatasetReference",
+									"parameters": {
+										"sqlTable": {
+											"value": "@pipeline().parameters.p_table",
+											"type": "Expression"
+										},
+										"sqlSchema": {
+											"value": "@pipeline().parameters.p_schema",
+											"type": "Expression"
+										},
+										"sqlDb": {
+											"value": "@pipeline().parameters.p_db",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_adls_as22",
+									"type": "DatasetReference",
+									"parameters": {
+										"pContainer": "landing",
+										"pFolder": {
+											"value": "@pipeline().parameters.p_schema",
+											"type": "Expression"
+										},
+										"pSubFolder": "@pipeline().parameters.p_table",
+										"pFile": {
+											"value": "@variables('v_file')",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "update-watermark",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "set-copy-details-out",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[UpdateWatermark]",
+								"storedProcedureParameters": {
+									"pLastRunTime": {
+										"value": {
+											"value": "@activity('get-new-watermark').output.firstRow.wm_new",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									},
+									"pMetaId": {
+										"value": {
+											"value": "@activity('init-audit-meta').output.pipelineReturnValue.oMetadataId",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "ln_SqlServer_AW22",
+								"type": "LinkedServiceReference",
+								"parameters": {
+									"sqldb": {
+										"value": "@variables('v_framework_db')",
+										"type": "Expression"
+									}
+								}
+							}
+						},
+						{
+							"name": "set-copy-details-out",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "copy-sql",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "pipelineReturnValue",
+								"value": [
+									{
+										"key": "o_copy_duration",
+										"value": {
+											"type": "Expression",
+											"content": "@activity('copy-sql').output.copyDuration"
+										}
+									},
+									{
+										"key": "o_copy_rowcount",
+										"value": {
+											"type": "Expression",
+											"content": "@activity('copy-sql').output.rowsCopied"
+										}
+									}
+								],
+								"setSystemVariable": true
+							}
+						},
+						{
+							"name": "set-error-copy",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "copy-sql",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "pl-error-log",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"p_activity_name": "copy-sql",
+									"p_audit_id": {
+										"value": "@activity('init-audit-meta').output.pipelineReturnValue.oAuditId",
+										"type": "Expression"
+									},
+									"p_error_message": {
+										"value": "@activity('copy-sql').error.message",
+										"type": "Expression"
+									},
+									"p_target_file_path": {
+										"value": "@activity('init-audit-meta').output.pipelineReturnValue.oTargetFilePath",
+										"type": "Expression"
+									},
+									"p_target_system": {
+										"value": "@activity('init-audit-meta').output.pipelineReturnValue.oTargetSystem",
+										"type": "Expression"
+									},
+									"p_target_table": {
+										"value": "@activity('init-audit-meta').output.pipelineReturnValue.oTargetTable",
+										"type": "Expression"
+									},
+									"p_water_mark_current": {
+										"value": "@activity('get-new-watermark').output.firstRow.wm_new",
+										"type": "Expression"
+									},
+									"p_water_mark_previous": {
+										"value": "@activity('init-audit-meta').output.pipelineReturnValue.oLastRunTimestamp",
+										"type": "Expression"
+									},
+									"p_metadata_id": {
+										"value": "@activity('init-audit-meta').output.pipelineReturnValue.oMetadataId",
+										"type": "Expression"
+									}
+								}
+							}
+						},
+						{
+							"name": "set-error-wm-upd",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "update-watermark",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "pl-error-log",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"p_activity_name": "update-watermark",
+									"p_audit_id": {
+										"value": "@activity('init-audit-meta').output.pipelineReturnValue.oAuditId",
+										"type": "Expression"
+									},
+									"p_copy_duration_seconds": {
+										"value": "@activity('copy-sql').output.copyDuration",
+										"type": "Expression"
+									},
+									"p_error_message": {
+										"value": "@activity('update-watermark').error.message",
+										"type": "Expression"
+									},
+									"p_rows_copied": {
+										"value": "@activity('copy-sql').output.rowsCopied",
+										"type": "Expression"
+									},
+									"p_target_file_path": {
+										"value": "@activity('init-audit-meta').output.pipelineReturnValue.oTargetFilePath",
+										"type": "Expression"
+									},
+									"p_target_system": {
+										"value": "@activity('init-audit-meta').output.pipelineReturnValue.oTargetSystem",
+										"type": "Expression"
+									},
+									"p_target_table": {
+										"value": "@activity('init-audit-meta').output.pipelineReturnValue.oTargetTable",
+										"type": "Expression"
+									},
+									"p_water_mark_current": {
+										"value": "@activity('get-new-watermark').output.firstRow.wm_new",
+										"type": "Expression"
+									},
+									"p_water_mark_previous": {
+										"value": "@activity('init-audit-meta').output.pipelineReturnValue.oLastRunTimestamp",
+										"type": "Expression"
+									},
+									"p_metadata_id": {
+										"value": "@activity('init-audit-meta').output.pipelineReturnValue.oMetadataId",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "audit-success",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "if-new-data",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[UpdateJobAuditDetail]",
+					"storedProcedureParameters": {
+						"pActivityName": {
+							"value": {
+								"value": "copy-sql",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"pAuditId": {
+							"value": {
+								"value": "@activity('init-audit-meta').output.pipelineReturnValue.oAuditId",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"pCopyDurationSeconds": {
+							"value": {
+								"value": "@activity('copy-sql')?.output.copyDuration",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"pEndTime": {
+							"value": {
+								"value": "@utcNow()",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"pErrorMessage": {
+							"value": null,
+							"type": "String"
+						},
+						"pRowsCopied": {
+							"value": {
+								"value": "@activity('copy-sql')?.output.rowsCopied",
+								"type": "Expression"
+							},
+							"type": "Int64"
+						},
+						"pStatus": {
+							"value": {
+								"value": "@variables('v_success_status')",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"pTargetFilePath": {
+							"value": {
+								"value": "@activity('init-audit-meta').output.pipelineReturnValue.oTargetFilePath",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"pTargetSystem": {
+							"value": {
+								"value": "@activity('init-audit-meta').output.pipelineReturnValue.oTargetSystem",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"pTargetTable": {
+							"value": {
+								"value": "@activity('init-audit-meta').output.pipelineReturnValue.oTargetTable",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"pMetadataId": {
+							"value": {
+								"value": "@activity('init-audit-meta').output.pipelineReturnValue.oMetadataId",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"pWaterMarkPrevious": {
+							"value": {
+								"value": "@activity('init-audit-meta').output.pipelineReturnValue.oLastRunTimestamp",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"pWaterMarkCurrent": {
+							"value": {
+								"value": "@activity('get-new-watermark').output.firstRow.wm_new",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ln_SqlServer_AW22",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"sqldb": "FrameworkDb"
+					}
+				}
+			},
+			{
+				"name": "set-prev-watermark",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "init-audit-meta",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "v_old_wm",
+					"value": {
+						"value": "@if(equals(trim(coalesce(activity('init-audit-meta').output.pipelineReturnValue.oLastRunTimestamp,'')),''),'1900-01-01',activity('init-audit-meta').output.pipelineReturnValue.oLastRunTimestamp)",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "set-error-wm",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "get-new-watermark",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-error-log",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"p_activity_name": "get-new-watermark",
+						"p_audit_id": {
+							"value": "@activity('init-audit-meta').output.pipelineReturnValue.oAuditId",
+							"type": "Expression"
+						},
+						"p_error_message": {
+							"value": "@activity('get-new-watermark').error.message",
+							"type": "Expression"
+						},
+						"p_target_file_path": {
+							"value": "@activity('init-audit-meta').output.pipelineReturnValue.oTargetFilePath",
+							"type": "Expression"
+						},
+						"p_target_system": {
+							"value": "@activity('init-audit-meta').output.pipelineReturnValue.oTargetSystem",
+							"type": "Expression"
+						},
+						"p_target_table": {
+							"value": "@activity('init-audit-meta').output.pipelineReturnValue.oTargetTable",
+							"type": "Expression"
+						},
+						"p_water_mark_previous": {
+							"value": "@activity('init-audit-meta').output.pipelineReturnValue.oLastRunTimestamp",
+							"type": "Expression"
+						},
+						"p_metadata_id": {
+							"value": "@activity('init-audit-meta').output.pipelineReturnValue.oMetadataId",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "set-error-audit-success",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "audit-success",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-error-log",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"p_activity_name": "audit-success",
+						"p_audit_id": {
+							"value": "@activity('init-audit-meta').output.pipelineReturnValue.oAuditId",
+							"type": "Expression"
+						},
+						"p_copy_duration_seconds": {
+							"value": "@if(equals(activity('copy-sql').status, 'Succeeded'), coalesce(activity('copy-sql').output?.copyDuration, 0), 0)\n",
+							"type": "Expression"
+						},
+						"p_error_message": {
+							"value": "@activity('audit-success').error.message",
+							"type": "Expression"
+						},
+						"p_rows_copied": {
+							"value": "@activity('copy-sql').output?.rowsCopied",
+							"type": "Expression"
+						},
+						"p_target_file_path": {
+							"value": "@activity('init-audit-meta').output.pipelineReturnValue.oTargetFilePath",
+							"type": "Expression"
+						},
+						"p_target_system": {
+							"value": "@activity('init-audit-meta').output.pipelineReturnValue.oTargetSystem",
+							"type": "Expression"
+						},
+						"p_target_table": {
+							"value": "@activity('init-audit-meta').output.pipelineReturnValue.oTargetTable",
+							"type": "Expression"
+						},
+						"p_water_mark_current": {
+							"value": "@activity('get-new-watermark').output.firstRow.wm_new",
+							"type": "Expression"
+						},
+						"p_water_mark_previous": {
+							"value": "@activity('init-audit-meta').output.pipelineReturnValue.oLastRunTimestamp",
+							"type": "Expression"
+						},
+						"p_metadata_id": {
+							"value": "@activity('init-audit-meta').output.pipelineReturnValue.oMetadataId",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "init-audit-meta",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_init_metad",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"p_source_system": {
+							"value": "@variables('v_source_system')",
+							"type": "Expression"
+						},
+						"p_source_container": {
+							"value": "@pipeline().parameters.p_db",
+							"type": "Expression"
+						},
+						"p_schema": {
+							"value": "@pipeline().parameters.p_schema",
+							"type": "Expression"
+						},
+						"p_table": {
+							"value": "@pipeline().parameters.p_table",
+							"type": "Expression"
+						},
+						"p_audit_id_parent": {
+							"value": "@pipeline().parameters.p_audit_id_parent",
+							"type": "Expression"
+						}
+					}
+				}
+			}
+		],
+		"parameters": {
+			"p_db": {
+				"type": "string",
+				"defaultValue": "AdventureWorks2022"
+			},
+			"p_schema": {
+				"type": "string",
+				"defaultValue": "Sales"
+			},
+			"p_table": {
+				"type": "string",
+				"defaultValue": "ShoppingCartItem"
+			},
+			"p_audit_id_parent": {
+				"type": "int",
+				"defaultValue": 0
+			}
+		},
+		"variables": {
+			"v_run_start": {
+				"type": "String"
+			},
+			"v_framework_db": {
+				"type": "String",
+				"defaultValue": "FrameworkDb"
+			},
+			"v_framework_table": {
+				"type": "String",
+				"defaultValue": "dbo.TableMetadata"
+			},
+			"v_file": {
+				"type": "String"
+			},
+			"v_init_status": {
+				"type": "String",
+				"defaultValue": "Started"
+			},
+			"v_old_wm": {
+				"type": "String"
+			},
+			"v_success_status": {
+				"type": "String",
+				"defaultValue": "Succeeded"
+			},
+			"v_source_system": {
+				"type": "String",
+				"defaultValue": "Database"
+			}
+		},
+		"folder": {
+			"name": "Arch"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-10-20T17:16:06Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

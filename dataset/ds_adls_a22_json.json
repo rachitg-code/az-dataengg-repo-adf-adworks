@@ -1,0 +1,44 @@
+{
+	"name": "ds_adls_a22_json",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ln_Adls_AW22",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"pContainer": {
+				"type": "string"
+			},
+			"pFolder": {
+				"type": "string"
+			},
+			"pSubFolder": {
+				"type": "string"
+			},
+			"pFile": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().pFile",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@concat(dataset().pFolder,'/',dataset().pSubFolder)",
+					"type": "Expression"
+				},
+				"fileSystem": {
+					"value": "@dataset().pContainer",
+					"type": "Expression"
+				}
+			}
+		},
+		"schema": {}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
