@@ -21,6 +21,11 @@ sqluser1-pwd
 adventureworks-22-proj-adf
 f226bff9-204e-4bb0-8cf6-76a0d8eecf49
 
+
+https://dev.azure.com/rachitg-az-dataengg-org/rachitg-az-dataengg-proj/_build?definitionId=2&_a=summary
+https://github.com/rachitg-code/az-dataengg-repo-adf-adworks
+
+
 --------------------------
 
 AdventureWorks2022
