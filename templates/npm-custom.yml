@@ -1,6 +1,6 @@
 parameters:
-  -name : customCommand
-  -name : displayName
+  - name: 'customCommand'
+  - name: 'displayName'
 
 
 steps:
