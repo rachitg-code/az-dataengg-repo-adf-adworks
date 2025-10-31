@@ -32,6 +32,9 @@ stages:
       - job: Build_Adf_Arm_Template
         displayName: 'Build ADF Arm Template'
         steps:
+          - script: |
+              echo "deb : $(packagePath) > $(adfRootPath) ~ $(subscriptionId) >> $(resourceGroup) >> $(dataFactory)"
+            displayName: 'Build ADF Artifacts Script'
           - template : templates/setup-node-npm.yml
             parameters:
               packagePath: '$(packagePath)'
