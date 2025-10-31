@@ -6,8 +6,11 @@ steps:
     inputs:
       versionSpec: '18.x'
     displayName: 'Install Node.js'
+  - script: |
+      echo "deb2 : $(Build.Repository.LocalPath)${{ parameters.packagePath }}"
+    displayName: 'debug2'
   - task: Npm@1
     inputs:
       command: 'install'
-      displayName: 'Install NPM Packages'
       workingDir: '$(Build.Repository.LocalPath)${{ parameters.packagePath }}'
+    displayName: 'Install NPM Packages'

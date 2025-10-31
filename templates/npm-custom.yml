@@ -4,6 +4,9 @@ parameters:
 
 
 steps:
+  - script: |
+      echo "deb3 : ${{parameters.customCommand}}"
+    displayName: 'debug3'
   - task: Npm@1
     inputs:
       command: 'custom'

@@ -34,7 +34,7 @@ stages:
         steps:
           - script: |
               echo "deb : $(packagePath) > $(adfRootPath) ~ $(subscriptionId) >> $(resourceGroup) >> $(dataFactory)"
-            displayName: 'Build ADF Artifacts Script'
+            displayName: 'debug'
           - template : templates/setup-node-npm.yml
             parameters:
               packagePath: '$(packagePath)'
