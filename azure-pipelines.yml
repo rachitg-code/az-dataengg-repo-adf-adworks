@@ -42,10 +42,12 @@ stages:
             parameters:
               customCommand: 'run build validate $(Build.Repository.LocalPath)$(adfRootPath) /subscriptions/$(subscriptionId)/resourceGroups/$(resourceGroup)/providers/Microsoft.DataFactory/factories/$(dataFactory)'
               displayName: 'Run ADF Validation'
+              packagePath: '$(packagePath)'
           - template : templates/npm-custom.yml
             parameters:
               customCommand: 'run build export $(Build.Repository.LocalPath)$(adfRootPath) /subscriptions/$(subscriptionId)/resourceGroups/$(resourceGroup)/providers/Microsoft.DataFactory/factories/$(dataFactory) ArmTemplate'
               displayName: 'Run ADF Export'
+              packagePath: '$(packagePath)'
           - task: PublishPipelineArtifact@1
             inputs:
               targetPath: '$(Build.Repository.LocalPath)$(packagePath)/ArmTemplate'

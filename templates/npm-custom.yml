@@ -1,6 +1,7 @@
 parameters:
   - name: 'customCommand'
   - name: 'displayName'
+  - name: 'packagePath'
 
 
 steps:
