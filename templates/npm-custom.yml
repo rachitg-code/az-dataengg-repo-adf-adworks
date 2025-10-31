@@ -1,0 +1,11 @@
+parameters:
+  -name : customCommand
+  -name : displayName
+
+
+steps:
+  - task: Npm@1
+    inputs:
+      command: 'custom'
+      customCommand: ${{parameters.customCommand}}
+    displayName: ${{parameters.displayName}}
