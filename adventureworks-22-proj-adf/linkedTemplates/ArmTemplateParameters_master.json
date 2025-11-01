@@ -1,0 +1,42 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "adventureworks-22-proj-adf"
+		},
+		"ln_Adls_AW22_properties_typeProperties_url": {
+			"value": "https://adventureworks22dl.dfs.core.windows.net/"
+		},
+		"ln_SqlServer_AW22_properties_typeProperties_server": {
+			"value": "DESKTOP-6SOBJNP"
+		},
+		"ln_SqlServer_AW22_properties_typeProperties_database": {
+			"value": "@{linkedService().sqldb}"
+		},
+		"ln_SqlServer_AW22_properties_typeProperties_userName": {
+			"value": "sqluser1"
+		},
+		"ln_keyvault_aw22_properties_typeProperties_baseUrl": {
+			"value": "https://kv-dataengg-proj-aw22.vault.azure.net/"
+		},
+		"ln_rest_countries_properties_typeProperties_url": {
+			"value": "https://restcountries.com/v3.1/name"
+		},
+		"ln_sftp_rebex_properties_typeProperties_host": {
+			"value": "test.rebex.net"
+		},
+		"ln_sftp_rebex_properties_typeProperties_hostKeyFingerprint": {
+			"value": "ssh-ed25519 32 e7:e4:45:c6:b8:e4:bb:d8:68:89:27:86:fd:01:58:f0"
+		},
+		"ln_sftp_rebex_properties_typeProperties_userName": {
+			"value": "demo"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}

@@ -1,0 +1,125 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "adventureworks-22-proj-adf"
+		},
+		"ln_Adls_AW22_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://adventureworks22dl.dfs.core.windows.net/"
+		},
+		"ln_SqlServer_AW22_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "DESKTOP-6SOBJNP"
+		},
+		"ln_SqlServer_AW22_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "@{linkedService().sqldb}"
+		},
+		"ln_SqlServer_AW22_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "sqluser1"
+		},
+		"ln_keyvault_aw22_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://kv-dataengg-proj-aw22.vault.azure.net/"
+		},
+		"ln_rest_countries_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://restcountries.com/v3.1/name"
+		},
+		"ln_sftp_rebex_properties_typeProperties_host": {
+			"type": "string",
+			"defaultValue": "test.rebex.net"
+		},
+		"ln_sftp_rebex_properties_typeProperties_hostKeyFingerprint": {
+			"type": "string",
+			"defaultValue": "ssh-ed25519 32 e7:e4:45:c6:b8:e4:bb:d8:68:89:27:86:fd:01:58:f0"
+		},
+		"ln_sftp_rebex_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "demo"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "adventureworks-22-proj-adf_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"ln_Adls_AW22_properties_typeProperties_url": {
+						"value": "[parameters('ln_Adls_AW22_properties_typeProperties_url')]"
+					},
+					"ln_keyvault_aw22_properties_typeProperties_baseUrl": {
+						"value": "[parameters('ln_keyvault_aw22_properties_typeProperties_baseUrl')]"
+					},
+					"ln_rest_countries_properties_typeProperties_url": {
+						"value": "[parameters('ln_rest_countries_properties_typeProperties_url')]"
+					},
+					"ln_SqlServer_AW22_properties_typeProperties_server": {
+						"value": "[parameters('ln_SqlServer_AW22_properties_typeProperties_server')]"
+					},
+					"ln_SqlServer_AW22_properties_typeProperties_database": {
+						"value": "[parameters('ln_SqlServer_AW22_properties_typeProperties_database')]"
+					},
+					"ln_SqlServer_AW22_properties_typeProperties_userName": {
+						"value": "[parameters('ln_SqlServer_AW22_properties_typeProperties_userName')]"
+					},
+					"ln_sftp_rebex_properties_typeProperties_host": {
+						"value": "[parameters('ln_sftp_rebex_properties_typeProperties_host')]"
+					},
+					"ln_sftp_rebex_properties_typeProperties_hostKeyFingerprint": {
+						"value": "[parameters('ln_sftp_rebex_properties_typeProperties_hostKeyFingerprint')]"
+					},
+					"ln_sftp_rebex_properties_typeProperties_userName": {
+						"value": "[parameters('ln_sftp_rebex_properties_typeProperties_userName')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "adventureworks-22-proj-adf_ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'adventureworks-22-proj-adf_ArmTemplate_0')]"
+			]
+		}
+	]
+}
