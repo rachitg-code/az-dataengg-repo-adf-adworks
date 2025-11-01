@@ -4741,6 +4741,9 @@
 						"defaultValue": "SQLWrapper"
 					}
 				},
+				"folder": {
+					"name": "Utils"
+				},
 				"annotations": [],
 				"lastPublishTime": "2025-10-23T12:00:33Z"
 			},
@@ -6367,7 +6370,7 @@
 					},
 					"v_success_status": {
 						"type": "String",
-						"defaultValue": "Succeeded"
+						"defaultValue": "SucceededTest"
 					},
 					"v_source_system": {
 						"type": "String",
