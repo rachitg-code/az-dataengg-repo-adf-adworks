@@ -1,0 +1,16 @@
+parameters:
+  - name: 'customCommand'
+  - name: 'displayName'
+  - name: 'packagePath'
+
+
+steps:
+  - script: |
+      echo "deb3 : ${{parameters.customCommand}} > $(Build.Repository.LocalPath)${{ parameters.packagePath }}"
+    displayName: 'debug3'
+  - task: Npm@1
+    inputs:
+      command: 'custom'
+      workingDir: '$(Build.Repository.LocalPath)${{ parameters.packagePath }}'
+      customCommand: ${{parameters.customCommand}}
+    displayName: ${{parameters.displayName}}

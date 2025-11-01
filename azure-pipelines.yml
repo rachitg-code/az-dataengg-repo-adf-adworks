@@ -6,16 +6,50 @@
 #test
 
 trigger:
-- dev
+  branches:
+    include:
+      - dev
+
+variables:
+  - group: advwrks22-vg-kv  # variable group reference
+  - name: resourceGroup     # individual variables
+    value: 'adventureworks-22-proj-rg'
+  - name: dataFactory
+    value: 'adventureworks-22-proj-adf'
+  - name: packagePath
+    value: '/build/'
+  - name: adfRootPath
+    value: ''
+  
 
 pool:
   vmImage: ubuntu-latest
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+stages:
+  - stage: Build_And_Publish_Adf_Artifacts
+    displayName: 'Build and Publish ADF Artifacts'
+    jobs:
+      - job: Build_Adf_Arm_Template
+        displayName: 'Build ADF Arm Template'
+        steps:
+          - script: |
+              echo "deb : $(packagePath) > $(adfRootPath) ~ $(subscriptionId) >> $(resourceGroup) >> $(dataFactory) >> $(Build.Repository.LocalPath)"
+            displayName: 'debug'
+          - template : templates/setup-node-npm.yml
+            parameters:
+              packagePath: '$(packagePath)'
+          - template : templates/npm-custom.yml
+            parameters:
+              customCommand: 'run build validate $(Build.Repository.LocalPath)$(adfRootPath) /subscriptions/$(subscriptionId)/resourceGroups/$(resourceGroup)/providers/Microsoft.DataFactory/factories/$(dataFactory)'
+              displayName: 'Run ADF Validation'
+              packagePath: '$(packagePath)'
+          - template : templates/npm-custom.yml
+            parameters:
+              customCommand: 'run build export $(Build.Repository.LocalPath)$(adfRootPath) /subscriptions/$(subscriptionId)/resourceGroups/$(resourceGroup)/providers/Microsoft.DataFactory/factories/$(dataFactory) ArmTemplate'
+              displayName: 'Run ADF Export'
+              packagePath: '$(packagePath)'
+          - task: PublishPipelineArtifact@1
+            inputs:
+              targetPath: '$(Build.Repository.LocalPath)$(packagePath)/ArmTemplate'
+              artifact: 'ArmTemplate'
+            displayName: 'Publish ADF Arm Template Artifact'
