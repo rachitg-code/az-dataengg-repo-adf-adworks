@@ -1,0 +1,352 @@
+{
+	"name": "pl_init_metad-sql-wrapper-bkp",
+	"properties": {
+		"activities": [
+			{
+				"name": "set-return-values",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "ForEach-Meta-Append",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "pipelineReturnValue",
+					"value": [
+						{
+							"key": "oRunStart",
+							"value": {
+								"type": "Expression",
+								"content": "@variables('v_run_start')"
+							}
+						},
+						{
+							"key": "oMetadata",
+							"value": {
+								"type": "Expression",
+								"content": "@variables('v_return_array')"
+							}
+						},
+						{
+							"key": "oAuditId",
+							"value": {
+								"type": "Expression",
+								"content": "@activity('sp-audit-init').output.firstRow.oAuditId"
+							}
+						}
+					],
+					"setSystemVariable": true
+				}
+			},
+			{
+				"name": "fail-parent",
+				"type": "Fail",
+				"dependsOn": [
+					{
+						"activity": "set-error-lkp-all",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"message": {
+						"value": "@activity('lkp-sql-metadata-all').error.message",
+						"type": "Expression"
+					},
+					"errorCode": "v_err_cd"
+				}
+			},
+			{
+				"name": "ForEach-Meta-Append",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "lkp-sql-metadata-all",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('lkp-sql-metadata-all').output.value",
+						"type": "Expression"
+					},
+					"batchCount": 5,
+					"activities": [
+						{
+							"name": "append-return-array",
+							"type": "AppendVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "v_return_array",
+								"value": {
+									"value": "@concat('{',\n    '\"MetadataId\": \"', string(item().Id), '\",',\n    '\"SourceSystem\": \"', item().SourceSystem, '\",',\n    '\"SourceType\": \"', item().SourceType, '\",',\n    '\"SourceConnection\": \"', item().SourceConnection, '\",',\n    '\"SourceContainer\": \"', item().SourceContainer, '\",',\n    '\"SourceSchema\": \"', item().SourceSchema, '\",',\n    '\"SourceTable\": \"', item().SourceTable, '\",',\n    '\"SourceFilePath\": \"', item().SourceFilePath, '\",',\n    '\"TargetSystem\": \"', item().TargetSystem, '\",',\n    '\"TargetType\": \"', item().TargetType, '\",',\n    '\"TargetConnection\": \"', item().TargetConnection, '\",',\n    '\"TargetSchema\": \"', item().TargetSchema, '\",',\n    '\"TargetTable\": \"', item().TargetTable, '\",',\n    '\"TargetFilePath\": \"', item().TargetFilePath, '\",',\n    '\"LoadType\": \"', item().LoadType, '\",',\n    '\"IsActive\": ', string(int(item().IsActive)), ',',\n    '\"PrimaryKeys\": \"', item().PrimaryKeys, '\",',\n    '\"LastRunTimestamp\": \"', string(item().LastRunTimestamp), '\",',\n    '\"CreatedOn\": \"', string(item().CreatedOn), '\",',\n    '\"ModifiedOn\": \"', string(item().ModifiedOn), '\"',\n'}'\n)",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "lkp-sql-metadata-all",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "sp-audit-init",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderQuery": {
+							"value": "@concat('SELECT * FROM [dbo].[TableMetadata] WHERE SourceSystem = ''Database'' AND SourceType = ''OnPremSQL'' AND IsActive =1')",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_sql_server_aw22_onprem_home",
+						"type": "DatasetReference",
+						"parameters": {
+							"sqlTable": "TableMetadata",
+							"sqlSchema": "dbo",
+							"sqlDb": {
+								"value": "@variables('v_framework_db')",
+								"type": "Expression"
+							}
+						}
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "set-run-start",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "v_run_start",
+					"value": {
+						"value": "@formatDateTime(utcNow(), 'yyyy-MM-dd HH:mm:ss')\n",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "sp-audit-init",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "set-run-start",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderStoredProcedureName": "dbo.InsertJobAuditDetail",
+						"storedProcedureParameters": {
+							"ActivityName": {
+								"type": "String",
+								"value": null
+							},
+							"CopyDurationSeconds": {
+								"type": "Int32",
+								"value": null
+							},
+							"EndTime": {
+								"type": "DateTime",
+								"value": null
+							},
+							"ErrorMessage": {
+								"type": "String",
+								"value": null
+							},
+							"MetadataId": {
+								"type": "Int32",
+								"value": null
+							},
+							"PipelineName": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().Pipeline",
+									"type": "Expression"
+								}
+							},
+							"RowsCopied": {
+								"type": "Int64",
+								"value": null
+							},
+							"RunId": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().RunId",
+									"type": "Expression"
+								}
+							},
+							"SourceFilePath": {
+								"type": "String",
+								"value": null
+							},
+							"SourceSystem": {
+								"type": "String",
+								"value": null
+							},
+							"SourceTable": {
+								"type": "String",
+								"value": {
+									"value": "@variables('v_wrapper')",
+									"type": "Expression"
+								}
+							},
+							"StartTime": {
+								"type": "DateTime",
+								"value": {
+									"value": "@variables('v_run_start')",
+									"type": "Expression"
+								}
+							},
+							"Status": {
+								"type": "String",
+								"value": {
+									"value": "@variables('v_init_status')",
+									"type": "Expression"
+								}
+							},
+							"TargetFilePath": {
+								"type": "String",
+								"value": null
+							},
+							"TargetSystem": {
+								"type": "String",
+								"value": null
+							},
+							"TargetTable": {
+								"type": "String",
+								"value": null
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_sql_server_aw22_onprem_home",
+						"type": "DatasetReference",
+						"parameters": {
+							"sqlTable": "dummy",
+							"sqlSchema": "dummy",
+							"sqlDb": "@variables('v_framework_db')"
+						}
+					}
+				}
+			},
+			{
+				"name": "set-error-lkp-all",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "lkp-sql-metadata-all",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl-error-log",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"p_activity_name": "lkp-sql-metadata",
+						"p_audit_id": {
+							"value": "@activity('sp-audit-init').output.firstRow.oAuditId",
+							"type": "Expression"
+						},
+						"p_error_message": {
+							"value": "@activity('lkp-sql-metadata-all').error.message",
+							"type": "Expression"
+						}
+					}
+				}
+			}
+		],
+		"variables": {
+			"v_run_start": {
+				"type": "String"
+			},
+			"v_framework_db": {
+				"type": "String",
+				"defaultValue": "FrameworkDb"
+			},
+			"v_framework_table": {
+				"type": "String",
+				"defaultValue": "dbo.TableMetadata"
+			},
+			"v_init_status": {
+				"type": "String",
+				"defaultValue": "Started"
+			},
+			"v_audit_id": {
+				"type": "Integer"
+			},
+			"v_return_array": {
+				"type": "Array"
+			},
+			"v_wrapper": {
+				"type": "String",
+				"defaultValue": "SQLWrapper"
+			}
+		},
+		"folder": {
+			"name": "Arch"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-10-23T12:00:33Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
