@@ -33,19 +33,19 @@ stages:
         displayName: 'Build ADF Arm Template'
         steps:
           - script: |
-              echo "deb : $(packagePath) > $(adfRootPath) ~ $(subscriptionId) >> $(resourceGroup) >> $(dataFactory) >> $(Build.Repository.LocalPath)"
+              echo "deb : $(packagePath) > $(adfRootPath) ~ $(advwrks22-adf-sbscr-id) >> $(resourceGroup) >> $(dataFactory) >> $(Build.Repository.LocalPath)"
             displayName: 'debug'
           - template : templates/setup-node-npm.yml
             parameters:
               packagePath: '$(packagePath)'
           - template : templates/npm-custom.yml
             parameters:
-              customCommand: 'run build validate $(Build.Repository.LocalPath)$(adfRootPath) /subscriptions/$(subscriptionId)/resourceGroups/$(resourceGroup)/providers/Microsoft.DataFactory/factories/$(dataFactory)'
+              customCommand: 'run build validate $(Build.Repository.LocalPath)$(adfRootPath) /subscriptions/$(advwrks22-adf-sbscr-id)/resourceGroups/$(resourceGroup)/providers/Microsoft.DataFactory/factories/$(dataFactory)'
               displayName: 'Run ADF Validation'
               packagePath: '$(packagePath)'
           - template : templates/npm-custom.yml
             parameters:
-              customCommand: 'run build export $(Build.Repository.LocalPath)$(adfRootPath) /subscriptions/$(subscriptionId)/resourceGroups/$(resourceGroup)/providers/Microsoft.DataFactory/factories/$(dataFactory) ArmTemplate'
+              customCommand: 'run build export $(Build.Repository.LocalPath)$(adfRootPath) /subscriptions/$(advwrks22-adf-sbscr-id)/resourceGroups/$(resourceGroup)/providers/Microsoft.DataFactory/factories/$(dataFactory) ArmTemplate'
               displayName: 'Run ADF Export'
               packagePath: '$(packagePath)'
           - task: PublishPipelineArtifact@1
