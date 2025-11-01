@@ -342,6 +342,9 @@
 				"defaultValue": "SQLWrapper"
 			}
 		},
+		"folder": {
+			"name": "Utils"
+		},
 		"annotations": [],
 		"lastPublishTime": "2025-10-23T12:00:33Z"
 	},
