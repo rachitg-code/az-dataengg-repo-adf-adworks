@@ -5,10 +5,10 @@
 
 #test
 
-trigger:
-  branches:
-    include:
-      - dev
+# trigger:
+#   branches:
+#     include:
+#       - dev
 
 variables:
   - group: advwrks22-vg-kv  # variable group reference

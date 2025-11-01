@@ -81,3 +81,6 @@ SELECT * FROM Production.TransactionHistory WHERE ModifiedDate > '2014-08-01 00:
 SELECT * FROM Sales.ShoppingCartItem
 
 SELECT * FROM Sales.ShoppingCartItem WHERE ModifiedDate > '2013-10-11T00:00:00'
+
+EXEC sp_rename '[dbo].[job_audit_detail]', '[job_audit_detail_v2]';
+
