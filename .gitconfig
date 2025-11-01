@@ -1,0 +1,11 @@
+[alias]
+    s = status
+    co = checkout
+    #cob = checkout -b
+    #br = branch
+    #ci = commit
+    cim = commit -m
+    ad = add .
+    pu = push
+    #pull = pull
+    lg = log --oneline --graph --decorate --all
