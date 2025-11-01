@@ -497,7 +497,7 @@
 			},
 			"v_success_status": {
 				"type": "String",
-				"defaultValue": "Succeeded"
+				"defaultValue": "SucceededTest"
 			},
 			"v_source_system": {
 				"type": "String",
