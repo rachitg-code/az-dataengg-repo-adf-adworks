@@ -3,17 +3,60 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-trigger:
-- dev
+# trigger:
+# - dev
+
+
+variables:
+  - group: advwrks22-vg-kv  # variable group reference
+  - name: resourceGroup     # individual variables
+    value: 'adventureworks-22-proj-rg'
+  - name: dataFactory
+    value: 'adventureworks-22-proj-adf'
 
 pool:
   vmImage: ubuntu-latest
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+resources:
+  pipelines:
+  - pipeline: azure-pipelines
+    source: rachitg-code.az-dataengg-repo-advwrks-adf-publish
+    trigger:
+      branches:
+        include:
+        - dev
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+stages:
+  stage: Deploy_to_Adf_Dev
+  displayName: 'Deploy to ADF - Dev Environment'
+  jobs:
+    - deployment: Deploy_Adf_Arm_Template
+      displayName: 'Deploy ADF Arm Template to Dev'
+      environment: 'adf-dev'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - script: |
+                    "ls -l $(Pipeline.Workspace)"
+                displayName: 'debug'
+              - script: |
+                    "ls -l $(Pipeline.Workspace)/ArmTemplate"
+                displayName: 'debug2'
+              - script: |
+                    "ls -l $(Pipeline.Workspace)/azure-pipelines/"
+                displayName: 'debug3'
+              - downLoad: azure-pipelines
+                artifact: ArmTemplate
+                - task: AzureResourceManagerTemplateDeployment@3
+                  displayName: 'Deploy ADF (Dev)'
+                  inputs:
+                    deploymentScope: 'Resource Group'
+                    azureResourceManagerConnection: 'github.com_rachitg-code'
+                    subscriptionId: $(advwrks22-adf-sbscr-id)
+                    action: 'Create Or Update Resource Group'
+                    resourceGroupName: $(resourceGroup)
+                    Location: 'South India'
+                    templateLocation: 'Linked artifact'
+                    csmFile: '$(Pipeline.Workspace)/ArmTemplate/ArmTemplateForFactory.json'
+                    csmParametersFile: '$(Pipeline.Workspace)/ArmTemplate/ArmTemplateParametersForFactory.json'
