@@ -43,10 +43,7 @@ stages:
                       ls -R $(Pipeline.Workspace)
                   displayName: 'debug3'
                 - script: |
-                      whoami
-                  displayName: 'debug'
-                - script: |
-                      ls -l $(Pipeline.Workspace)/azure-pipelines/ArmTemplate/Arm*.json
+                      ls -l $(Pipeline.Workspace)/azure-pipelines/ArmTemplate/ARMTemplateForFactory.json
                   displayName: 'debug2'
                 - task: AzureResourceManagerTemplateDeployment@3
                   displayName: 'Deploy ADF (Dev)'
