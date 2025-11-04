@@ -46,9 +46,9 @@ stages:
               - script: |
                     "ls -l $(Pipeline.Workspace)/azure-pipelines/"
                 displayName: 'debug3'
-              - downLoad: azure-pipelines
+              - download: azure-pipelines
                 artifact: ArmTemplate
-                - task: AzureResourceManagerTemplateDeployment@3
+              - task: AzureResourceManagerTemplateDeployment@3
                   displayName: 'Deploy ADF (Dev)'
                   inputs:
                     deploymentScope: 'Resource Group'
