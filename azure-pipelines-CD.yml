@@ -27,36 +27,36 @@ resources:
         - dev
 
 stages:
-  stage: Deploy_to_Adf_Dev
-  displayName: 'Deploy to ADF - Dev Environment'
-  jobs:
-    - deployment: Deploy_Adf_Arm_Template
-      displayName: 'Deploy ADF Arm Template to Dev'
-      environment: 'adf-dev'
-      strategy:
-        runOnce:
-          deploy:
-            steps:
-              - script: |
-                    "ls -l $(Pipeline.Workspace)"
-                displayName: 'debug'
-              - script: |
-                    "ls -l $(Pipeline.Workspace)/ArmTemplate"
-                displayName: 'debug2'
-              - script: |
-                    "ls -l $(Pipeline.Workspace)/azure-pipelines/"
-                displayName: 'debug3'
-              - download: azure-pipelines
-                artifact: ArmTemplate
-              - task: AzureResourceManagerTemplateDeployment@3
-                displayName: 'Deploy ADF (Dev)'
-                inputs:
-                  deploymentScope: 'Resource Group'
-                  azureResourceManagerConnection: 'github.com_rachitg-code'
-                  subscriptionId: $(advwrks22-adf-sbscr-id)
-                  action: 'Create Or Update Resource Group'
-                  resourceGroupName: $(resourceGroup)
-                  Location: 'South India'
-                  templateLocation: 'Linked artifact'
-                  csmFile: '$(Pipeline.Workspace)/ArmTemplate/ArmTemplateForFactory.json'
-                  csmParametersFile: '$(Pipeline.Workspace)/ArmTemplate/ArmTemplateParametersForFactory.json'
+  - stage: Deploy_to_Adf_Dev
+    displayName: 'Deploy to ADF - Dev Environment'
+    jobs:
+      - deployment: Deploy_Adf_Arm_Template
+        displayName: 'Deploy ADF Arm Template to Dev'
+        environment: 'adf-dev'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - script: |
+                      "ls -l $(Pipeline.Workspace)"
+                  displayName: 'debug'
+                - script: |
+                      "ls -l $(Pipeline.Workspace)/ArmTemplate"
+                  displayName: 'debug2'
+                - script: |
+                      "ls -l $(Pipeline.Workspace)/azure-pipelines/"
+                  displayName: 'debug3'
+                - download: azure-pipelines
+                  artifact: ArmTemplate
+                - task: AzureResourceManagerTemplateDeployment@3
+                  displayName: 'Deploy ADF (Dev)'
+                  inputs:
+                    deploymentScope: 'Resource Group'
+                    azureResourceManagerConnection: 'github.com_rachitg-code'
+                    subscriptionId: $(advwrks22-adf-sbscr-id)
+                    action: 'Create Or Update Resource Group'
+                    resourceGroupName: $(resourceGroup)
+                    Location: 'South India'
+                    templateLocation: 'Linked artifact'
+                    csmFile: '$(Pipeline.Workspace)/ArmTemplate/ArmTemplateForFactory.json'
+                    csmParametersFile: '$(Pipeline.Workspace)/ArmTemplate/ArmTemplateParametersForFactory.json'
