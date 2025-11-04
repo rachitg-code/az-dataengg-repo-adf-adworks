@@ -40,17 +40,8 @@ stages:
                 - download: azure-pipelines
                   artifact: ArmTemplate
                 - script: |
-                      pwd
-                  displayName: 'debug'
-                - script: |
-                      ls -R $(Pipeline.Workspace)
+                      echo $[resources.pipeline]
                   displayName: 'debug4'
-                - script: |
-                      ls -l $(Pipeline.Workspace)/ArmTemplate
-                  displayName: 'debug2'
-                - script: |
-                      ls -l $(Pipeline.Workspace)/azure-pipelines/
-                  displayName: 'debug3'
                 - task: AzureResourceManagerTemplateDeployment@3
                   displayName: 'Deploy ADF (Dev)'
                   inputs:
@@ -61,5 +52,5 @@ stages:
                     resourceGroupName: $(resourceGroup)
                     Location: 'South India'
                     templateLocation: 'Linked artifact'
-                    csmFile: '$(Pipeline.Workspace)/ArmTemplate/ArmTemplateForFactory.json'
-                    csmParametersFile: '$(Pipeline.Workspace)/ArmTemplate/ArmTemplateParametersForFactory.json'
+                    csmFile: '$(Pipeline.Workspace)/azure-pipelines/ArmTemplate/ArmTemplateForFactory.json'
+                    csmParametersFile: '$(Pipeline.Workspace)/azure-pipelines/ArmTemplate/ArmTemplateParametersForFactory.json'
