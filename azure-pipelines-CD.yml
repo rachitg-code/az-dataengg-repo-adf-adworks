@@ -27,27 +27,33 @@ resources:
         - dev
 
 stages:
-  stage: Deploy_to_Adf_Dev
-  displayName: 'Deploy to ADF - Dev Environment'
-  jobs:
-    - deployment: Deploy_Adf_Arm_Template
-      displayName: 'Deploy ADF Arm Template to Dev'
-      environment: 'adf-dev'
-      strategy:
-        runOnce:
-          deploy:
-            steps:
-              - download: azure-pipelines
-                artifact: ArmTemplate
-              - task: AzureResourceManagerTemplateDeployment@3
+  - stage: Deploy_to_Adf_Dev
+    displayName: 'Deploy to ADF - Dev Environment'
+    jobs:
+      - deployment: Deploy_Adf_Arm_Template
+        displayName: 'Deploy ADF Arm Template to Dev'
+        environment: 'adf-dev'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: azure-pipelines
+                  artifact: ArmTemplate
+                - script: |
+                      ls -R $(Pipeline.Workspace)
+                  displayName: 'debug3'
+                - script: |
+                      ls -l $(Pipeline.Workspace)/azure-pipelines/ArmTemplate/ARMTemplateForFactory.json
+                  displayName: 'debug2'
+                - task: AzureResourceManagerTemplateDeployment@3
                   displayName: 'Deploy ADF (Dev)'
                   inputs:
                     deploymentScope: 'Resource Group'
-                    azureResourceManagerConnection: 'github.com_rachitg-code'
+                    azureResourceManagerConnection: 'rachitg-dataengg (c38c0101-2c45-4838-b14a-9411d616169b)'
                     subscriptionId: $(advwrks22-adf-sbscr-id)
                     action: 'Create Or Update Resource Group'
                     resourceGroupName: $(resourceGroup)
                     Location: 'South India'
                     templateLocation: 'Linked artifact'
-                    csmFile: '$(Pipeline.Workspace)/ArmTemplate/ArmTemplateForFactory.json'
-                    csmParametersFile: '$(Pipeline.Workspace)/ArmTemplate/ArmTemplateParametersForFactory.json'
+                    csmFile: '$(Pipeline.Workspace)/azure-pipelines/ArmTemplate/ARMTemplateForFactory.json'
+                    csmParametersFile: '$(Pipeline.Workspace)/azure-pipelines/ArmTemplate/ARMTemplateParametersForFactory.json'
