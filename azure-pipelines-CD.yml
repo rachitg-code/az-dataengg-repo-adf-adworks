@@ -21,10 +21,10 @@ resources:
   pipelines:
   - pipeline: azure-pipelines
     source: rachitg-code.az-dataengg-repo-advwrks-adf-publish
-    trigger:
-      branches:
-        include:
-        - dev
+    # trigger:
+    #   branches:
+    #     include:
+    #     - dev
 
 stages:
   - stage: Deploy_to_Adf_Dev
@@ -39,12 +39,6 @@ stages:
               steps:
                 - download: azure-pipelines
                   artifact: ArmTemplate
-                - script: |
-                      ls -R $(Pipeline.Workspace)
-                  displayName: 'debug3'
-                - script: |
-                      ls -l $(Pipeline.Workspace)/azure-pipelines/ArmTemplate/ARMTemplateForFactory.json
-                  displayName: 'debug2'
                 - task: AzureResourceManagerTemplateDeployment@3
                   displayName: 'Deploy ADF (Dev)'
                   inputs:
