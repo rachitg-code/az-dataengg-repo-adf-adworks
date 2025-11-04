@@ -37,8 +37,10 @@ stages:
           runOnce:
             deploy:
               steps:
+                - download: azure-pipelines
+                  artifact: ArmTemplate
                 - script: |
-                      "ls -l $(Pipeline.Workspace)"
+                      "ls -R $(Pipeline.Workspace)"
                   displayName: 'debug'
                 - script: |
                       "ls -l $(Pipeline.Workspace)/ArmTemplate"
@@ -46,8 +48,6 @@ stages:
                 - script: |
                       "ls -l $(Pipeline.Workspace)/azure-pipelines/"
                   displayName: 'debug3'
-                - download: azure-pipelines
-                  artifact: ArmTemplate
                 - task: AzureResourceManagerTemplateDeployment@3
                   displayName: 'Deploy ADF (Dev)'
                   inputs:
