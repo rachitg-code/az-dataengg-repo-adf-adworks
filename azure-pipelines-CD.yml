@@ -43,7 +43,7 @@ stages:
                       ls -R $(Pipeline.Workspace)
                   displayName: 'debug3'
                 - script: |
-                      ls -l $(Pipeline.Workspace)/azure-pipelines/ArmTemplate
+                      whoami
                   displayName: 'debug'
                 - script: |
                       ls -l $(Pipeline.Workspace)/azure-pipelines/ArmTemplate/*.json
