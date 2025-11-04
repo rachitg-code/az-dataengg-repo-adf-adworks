@@ -40,16 +40,16 @@ stages:
                 - download: azure-pipelines
                   artifact: ArmTemplate
                 - script: |
-                      "pwd"
+                      pwd
                   displayName: 'debug'
                 - script: |
-                      "ls -R $(pwd)"
+                      ls -R $(Pipeline.Workspace)
                   displayName: 'debug4'
                 - script: |
-                      "ls -l $(Pipeline.Workspace)/ArmTemplate"
+                      ls -l $(Pipeline.Workspace)/ArmTemplate
                   displayName: 'debug2'
                 - script: |
-                      "ls -l $(Pipeline.Workspace)/azure-pipelines/"
+                      ls -l $(Pipeline.Workspace)/azure-pipelines/
                   displayName: 'debug3'
                 - task: AzureResourceManagerTemplateDeployment@3
                   displayName: 'Deploy ADF (Dev)'
