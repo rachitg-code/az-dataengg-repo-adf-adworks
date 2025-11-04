@@ -39,6 +39,12 @@ stages:
               steps:
                 - download: azure-pipelines
                   artifact: ArmTemplate
+                - script: |
+                      ls $(Pipeline.Workspace)/azure-pipelines/ArmTemplate/ArmTemplateForFactory.json
+                  displayName: 'debug'
+                - script: |
+                      ls $(Pipeline.Workspace)/azure-pipelines/ArmTemplate/ArmTemplateParametersForFactory.json
+                  displayName: 'debug2'
                 - task: AzureResourceManagerTemplateDeployment@3
                   displayName: 'Deploy ADF (Dev)'
                   inputs:
