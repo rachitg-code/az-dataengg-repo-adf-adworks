@@ -32,9 +32,9 @@ stages:
       - job: Build_Adf_Arm_Template
         displayName: 'Build ADF Arm Template'
         steps:
-          - script: |
-              echo "deb : $(packagePath) > $(adfRootPath) ~ $(advwrks22-adf-sbscr-id) >> $(resourceGroup) >> $(dataFactory) >> $(Build.Repository.LocalPath)"
-            displayName: 'debug'
+          # - script: |
+          #     echo "deb : $(packagePath) > $(adfRootPath) ~ $(advwrks22-adf-sbscr-id) >> $(resourceGroup) >> $(dataFactory) >> $(Build.Repository.LocalPath)"
+          #   displayName: 'debug'
           - template : templates/setup-node-npm.yml
             parameters:
               packagePath: '$(packagePath)'

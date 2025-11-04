@@ -5,9 +5,9 @@ parameters:
 
 
 steps:
-  - script: |
-      echo "deb3 : ${{parameters.customCommand}} > $(Build.Repository.LocalPath)${{ parameters.packagePath }}"
-    displayName: 'debug3'
+  # - script: |
+  #     echo "deb3 : ${{parameters.customCommand}} > $(Build.Repository.LocalPath)${{ parameters.packagePath }}"
+  #   displayName: 'debug3'
   - task: Npm@1
     inputs:
       command: 'custom'
