@@ -43,7 +43,7 @@ stages:
                       ls -R $(Pipeline.Workspace)
                   displayName: 'debug3'
                 - script: |
-                      ls $(Pipeline.Workspace)/azure-pipelines/ArmTemplate/ArmTemplateForFactory.json
+                      ls $(Pipeline.Workspace)/azure-pipelines/ArmTemplate
                   displayName: 'debug'
                 - script: |
                       ls $(Pipeline.Workspace)/azure-pipelines/ArmTemplate/ArmTemplateParametersForFactory.json
