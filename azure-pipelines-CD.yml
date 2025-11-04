@@ -40,11 +40,11 @@ stages:
                 - download: azure-pipelines
                   artifact: ArmTemplate
                 - script: |
-                      "ls -R ."
-                  displayName: 'debug4'
-                - script: |
                       "pwd"
                   displayName: 'debug'
+                - script: |
+                      "ls -R /"
+                  displayName: 'debug4'
                 - script: |
                       "ls -l $(Pipeline.Workspace)/ArmTemplate"
                   displayName: 'debug2'
