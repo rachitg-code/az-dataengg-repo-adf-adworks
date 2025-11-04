@@ -58,5 +58,5 @@ stages:
                     resourceGroupName: $(resourceGroup)
                     Location: 'South India'
                     templateLocation: 'Linked artifact'
-                    csmFile: '$(Pipeline.Workspace)/azure-pipelines/ArmTemplate/ArmTemplateForFactory.json'
-                    csmParametersFile: '$(Pipeline.Workspace)/azure-pipelines/ArmTemplate/ArmTemplateParametersForFactory.json'
+                    csmFile: '$(Pipeline.Workspace)/azure-pipelines/ArmTemplate/ARMTemplateForFactory.json'
+                    csmParametersFile: '$(Pipeline.Workspace)/azure-pipelines/ArmTemplate/ARMTemplateParametersForFactory.json'
