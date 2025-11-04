@@ -52,7 +52,7 @@ stages:
                   displayName: 'Deploy ADF (Dev)'
                   inputs:
                     deploymentScope: 'Resource Group'
-                    azureResourceManagerConnection: 'github.com_rachitg-code'
+                    azureResourceManagerConnection: 'rachitg-dataengg (c38c0101-2c45-4838-b14a-9411d616169b)'
                     subscriptionId: $(advwrks22-adf-sbscr-id)
                     action: 'Create Or Update Resource Group'
                     resourceGroupName: $(resourceGroup)
