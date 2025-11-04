@@ -49,14 +49,14 @@ stages:
               - download: azure-pipelines
                 artifact: ArmTemplate
               - task: AzureResourceManagerTemplateDeployment@3
-                  displayName: 'Deploy ADF (Dev)'
-                  inputs:
-                    deploymentScope: 'Resource Group'
-                    azureResourceManagerConnection: 'github.com_rachitg-code'
-                    subscriptionId: $(advwrks22-adf-sbscr-id)
-                    action: 'Create Or Update Resource Group'
-                    resourceGroupName: $(resourceGroup)
-                    Location: 'South India'
-                    templateLocation: 'Linked artifact'
-                    csmFile: '$(Pipeline.Workspace)/ArmTemplate/ArmTemplateForFactory.json'
-                    csmParametersFile: '$(Pipeline.Workspace)/ArmTemplate/ArmTemplateParametersForFactory.json'
+                displayName: 'Deploy ADF (Dev)'
+                inputs:
+                  deploymentScope: 'Resource Group'
+                  azureResourceManagerConnection: 'github.com_rachitg-code'
+                  subscriptionId: $(advwrks22-adf-sbscr-id)
+                  action: 'Create Or Update Resource Group'
+                  resourceGroupName: $(resourceGroup)
+                  Location: 'South India'
+                  templateLocation: 'Linked artifact'
+                  csmFile: '$(Pipeline.Workspace)/ArmTemplate/ArmTemplateForFactory.json'
+                  csmParametersFile: '$(Pipeline.Workspace)/ArmTemplate/ArmTemplateParametersForFactory.json'
