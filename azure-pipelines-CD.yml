@@ -43,7 +43,7 @@ stages:
                       "pwd"
                   displayName: 'debug'
                 - script: |
-                      "ls -R /"
+                      "ls -R $(pwd)"
                   displayName: 'debug4'
                 - script: |
                       "ls -l $(Pipeline.Workspace)/ArmTemplate"
