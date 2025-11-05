@@ -42,6 +42,7 @@ stages:
                 - script: |
                     echo "CI build ID: " $(resources.pipeline.azure-pipelines.runID)
                     echo "CI build number: " $(resources.pipeline.azure-pipelines.runName)
+                  displayName: 'Display CI Build Info'
                 - task: AzureResourceManagerTemplateDeployment@3
                   displayName: 'Deploy ADF (Dev)'
                   inputs:
