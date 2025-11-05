@@ -184,7 +184,7 @@
 			},
 			"p_source_system": {
 				"type": "string",
-				"defaultValue": "test-1"
+				"defaultValue": "test2"
 			}
 		},
 		"variables": {
