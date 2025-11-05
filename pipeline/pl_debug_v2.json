@@ -64,7 +64,7 @@
 			},
 			"v_source_system": {
 				"type": "String",
-				"defaultValue": "RestAPI_V1"
+				"defaultValue": "RestAPI_V2"
 			}
 		},
 		"annotations": [],
