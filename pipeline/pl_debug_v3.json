@@ -1,0 +1,217 @@
+{
+	"name": "pl_debug_v3",
+	"properties": {
+		"activities": [
+			{
+				"name": "set-run-start",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "v_run_start",
+					"value": {
+						"value": "@formatDateTime(utcNow(), 'yyyy-MM-dd HH:mm:ss')\n",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "sp-audit-init",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "set-run-start",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderStoredProcedureName": "dbo.InsertJobAuditDetail",
+						"storedProcedureParameters": {
+							"ActivityName": {
+								"type": "String",
+								"value": "sp-audit-init_test"
+							},
+							"CopyDurationSeconds": {
+								"type": "Int32",
+								"value": null
+							},
+							"EndTime": {
+								"type": "DateTime",
+								"value": null
+							},
+							"ErrorMessage": {
+								"type": "String",
+								"value": null
+							},
+							"MetadataId": {
+								"type": "Int32",
+								"value": null
+							},
+							"ParentAuditId": {
+								"type": "Int32",
+								"value": {
+									"value": "@pipeline().parameters.p_audit_id_parent",
+									"type": "Expression"
+								}
+							},
+							"PipelineName": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().Pipeline",
+									"type": "Expression"
+								}
+							},
+							"RowsCopied": {
+								"type": "Int64",
+								"value": null
+							},
+							"RunId": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().RunId",
+									"type": "Expression"
+								}
+							},
+							"SourceContainer": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().parameters.p_source_container",
+									"type": "Expression"
+								}
+							},
+							"SourceFilePath": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().parameters.p_source_system",
+									"type": "Expression"
+								}
+							},
+							"SourceSchema": {
+								"type": "String"
+							},
+							"SourceSystem": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().parameters.p_source_system",
+									"type": "Expression"
+								}
+							},
+							"SourceTable": {
+								"type": "String"
+							},
+							"StartTime": {
+								"type": "DateTime",
+								"value": {
+									"value": "@variables('v_run_start')",
+									"type": "Expression"
+								}
+							},
+							"Status": {
+								"type": "String",
+								"value": {
+									"value": "@variables('v_init_status')",
+									"type": "Expression"
+								}
+							},
+							"TargetFilePath": {
+								"type": "String",
+								"value": null
+							},
+							"TargetSystem": {
+								"type": "String",
+								"value": null
+							},
+							"TargetTable": {
+								"type": "String",
+								"value": null
+							},
+							"WaterMarkCurrent": {
+								"type": "DateTime",
+								"value": null
+							},
+							"WaterMarkPrevious": {
+								"type": "DateTime",
+								"value": null
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_sql_server_aw22_onprem_home",
+						"type": "DatasetReference",
+						"parameters": {
+							"sqlTable": "dummy",
+							"sqlSchema": "dummy",
+							"sqlDb": "@variables('v_framework_db')"
+						}
+					}
+				}
+			}
+		],
+		"parameters": {
+			"p_countries": {
+				"type": "array",
+				"defaultValue": [
+					"india"
+				]
+			},
+			"p_source_container": {
+				"type": "string",
+				"defaultValue": "api_restcountries"
+			},
+			"p_audit_id_parent": {
+				"type": "int",
+				"defaultValue": 0
+			},
+			"p_source_system": {
+				"type": "string",
+				"defaultValue": "test-1"
+			}
+		},
+		"variables": {
+			"v_base_container": {
+				"type": "String",
+				"defaultValue": "landing"
+			},
+			"v_folder": {
+				"type": "String",
+				"defaultValue": "restapi"
+			},
+			"v_framework_db": {
+				"type": "String",
+				"defaultValue": "FrameworkDb"
+			},
+			"v_source_system": {
+				"type": "String",
+				"defaultValue": "RestAPI_V1"
+			},
+			"v_run_start": {
+				"type": "String"
+			},
+			"v_init_status": {
+				"type": "String",
+				"defaultValue": "TestRun"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-10-23T09:12:41Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
