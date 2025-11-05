@@ -48,6 +48,8 @@ stages:
               customCommand: 'run build export $(Build.Repository.LocalPath)$(adfRootPath) /subscriptions/$(advwrks22-adf-sbscr-id)/resourceGroups/$(resourceGroup)/providers/Microsoft.DataFactory/factories/$(dataFactory) ArmTemplate'
               displayName: 'Run ADF Export'
               packagePath: '$(packagePath)'
+          - script: echo "Current Build ID: $(Build.BuildId)"
+            displayName: 'Display Build ID'
           - task: PublishPipelineArtifact@1
             inputs:
               targetPath: '$(Build.Repository.LocalPath)$(packagePath)/ArmTemplate'
