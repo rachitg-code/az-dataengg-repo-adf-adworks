@@ -21,6 +21,7 @@ resources:
   pipelines:
   - pipeline: azure-pipelines
     source: rachitg-code.az-dataengg-repo-advwrks-adf-publish
+    branch: dev
     # trigger:
     #   branches:
     #     include:
