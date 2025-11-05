@@ -45,7 +45,7 @@
 						"storedProcedureParameters": {
 							"ActivityName": {
 								"type": "String",
-								"value": "sp-audit-init"
+								"value": "sp-audit-init_test"
 							},
 							"CopyDurationSeconds": {
 								"type": "Int32",
@@ -103,11 +103,7 @@
 								}
 							},
 							"SourceSchema": {
-								"type": "String",
-								"value": {
-									"value": "@pipeline().parameters.p_schema",
-									"type": "Expression"
-								}
+								"type": "String"
 							},
 							"SourceSystem": {
 								"type": "String",
@@ -117,11 +113,7 @@
 								}
 							},
 							"SourceTable": {
-								"type": "String",
-								"value": {
-									"value": "@pipeline().parameters.p_table",
-									"type": "Expression"
-								}
+								"type": "String"
 							},
 							"StartTime": {
 								"type": "DateTime",
@@ -187,6 +179,10 @@
 			"p_audit_id_parent": {
 				"type": "int",
 				"defaultValue": 0
+			},
+			"p_source_system": {
+				"type": "string",
+				"defaultValue": "test-1"
 			}
 		},
 		"variables": {
@@ -205,6 +201,13 @@
 			"v_source_system": {
 				"type": "String",
 				"defaultValue": "RestAPI_V1"
+			},
+			"v_run_start": {
+				"type": "String"
+			},
+			"v_init_status": {
+				"type": "String",
+				"defaultValue": "TestRun"
 			}
 		},
 		"annotations": [],
