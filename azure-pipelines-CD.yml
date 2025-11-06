@@ -7,12 +7,24 @@
 # - dev
 
 
+parameters:
+  - name: Env
+    type: string
+    default: 'dev'
+    values:
+      - dev
+      - uat
+      - prod
+
+
 variables:
   - group: advwrks22-vg-kv  # variable group reference
   - name: resourceGroup     # individual variables
     value: 'adventureworks-22-proj-rg'
   - name: dataFactory
     value: 'adventureworks-22-proj-adf'
+  - name: parameterFileName
+    value: 'adf-parameters.${{ parameters.Env }}.json'
 
 pool:
   vmImage: ubuntu-latest
@@ -58,6 +70,6 @@ stages:
                     Location: 'South India'
                     templateLocation: 'Linked artifact'
                     csmFile: '$(Pipeline.Workspace)/azure-pipelines/ArmTemplate/ARMTemplateForFactory.json'
-                    csmParametersFile: '$(Pipeline.Workspace)/adf-parameters.dev.json'
+                    csmParametersFile: '$(Pipeline.Workspace)/azure-pipelines/ArmTemplate/adf-parameters.dev.json'
 
                     #csmParametersFile: '$(Pipeline.Workspace)/azure-pipelines/ArmTemplate/ARMTemplateParametersForFactory.json'
