@@ -10,6 +10,15 @@
 #     include:
 #       - dev
 
+parameters:
+  - name: Env
+    type: string
+    default: 'dev'
+    values:
+      - dev
+      - uat
+      - prod
+
 variables:
   - group: advwrks22-vg-kv  # variable group reference
   - name: resourceGroup     # individual variables
@@ -20,6 +29,8 @@ variables:
     value: '/build/'
   - name: adfRootPath
     value: ''
+  - name: parameterFileName
+    value: 'adf-parameters.${{ parameters.Env }}.json'
   
 
 pool:
@@ -51,6 +62,15 @@ stages:
           - script: |
               echo "Current Build ID: " $(Build.BuildId) " and Build Number: " $(Build.BuildNumber)
             displayName: 'Display Build ID'
+          - script: |
+              echo "SourcesDirectory: " $(Build.SourcesDirectory) " and Repository.LocalPath: " $(Build.Repository.LocalPath)
+            displayName: 'Sources Directory and Repository Local Path'
+          - script: |
+              ls -R $(Pipeline.Workspace)
+            displayName: 'debug'
+          - task: CopyFiles@2
+            inputs:
+              SourceFolder: '$(Build.Repository.LocalPath)/$(parameterFileName)'
           - task: PublishPipelineArtifact@1
             inputs:
               targetPath: '$(Build.Repository.LocalPath)$(packagePath)/ArmTemplate'
