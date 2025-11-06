@@ -55,4 +55,6 @@ stages:
                     Location: 'South India'
                     templateLocation: 'Linked artifact'
                     csmFile: '$(Pipeline.Workspace)/azure-pipelines/ArmTemplate/ARMTemplateForFactory.json'
-                    csmParametersFile: '$(Pipeline.Workspace)/azure-pipelines/ArmTemplate/ARMTemplateParametersForFactory.json'
+                    csmParametersFile: '$(Pipeline.Workspace)/adf-parameters.dev.json'
+
+                    #csmParametersFile: '$(Pipeline.Workspace)/azure-pipelines/ArmTemplate/ARMTemplateParametersForFactory.json'
