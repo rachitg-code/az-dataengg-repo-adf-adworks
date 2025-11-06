@@ -30,7 +30,7 @@
                         "source": {
                             "storedProcedureParameters": {
                                 "SourceSchema": "=",
-                                "SourceTable": "=:-St"
+                                "SourceTable": "=:-St:String"
                             }
                         }
                     }
