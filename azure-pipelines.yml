@@ -63,14 +63,15 @@ stages:
               echo "Current Build ID: " $(Build.BuildId) " and Build Number: " $(Build.BuildNumber)
             displayName: 'Display Build ID'
           - script: |
-              echo "SourcesDirectory: " $(Build.SourcesDirectory) " and Repository.LocalPath: " $(Build.Repository.LocalPath)
-            displayName: 'Sources Directory and Repository Local Path'
+              echo "SourceFolder: $(Build.Repository.LocalPath)/$(parameterFileName)"
+            displayName: 'Sources Path'
           - script: |
               ls -R $(Pipeline.Workspace)
             displayName: 'debug'
           - task: CopyFiles@2
             inputs:
               SourceFolder: '$(Build.Repository.LocalPath)/$(parameterFileName)'
+              targetFolder: '$(Build.Repository.LocalPath)$(packagePath)/ArmTemplate'
           - task: PublishPipelineArtifact@1
             inputs:
               targetPath: '$(Build.Repository.LocalPath)$(packagePath)/ArmTemplate'
