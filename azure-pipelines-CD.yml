@@ -43,7 +43,10 @@ stages:
                 - script: |
                     echo "CI build ID: " $(resources.pipeline.azure-pipelines.runID)
                     echo "CI build number: " $(resources.pipeline.azure-pipelines.runName)
-                  displayName: 'Display CI Build Info'
+                  displayName: 'CI Build Info'
+                - script: |
+                    ls -R $(Pipeline.Workspace)
+                  displayName: 'debug'
                 - task: AzureResourceManagerTemplateDeployment@3
                   displayName: 'Deploy ADF (Dev)'
                   inputs:
@@ -55,4 +58,6 @@ stages:
                     Location: 'South India'
                     templateLocation: 'Linked artifact'
                     csmFile: '$(Pipeline.Workspace)/azure-pipelines/ArmTemplate/ARMTemplateForFactory.json'
-                    csmParametersFile: '$(Pipeline.Workspace)/azure-pipelines/ArmTemplate/ARMTemplateParametersForFactory.json'
+                    csmParametersFile: '$(Pipeline.Workspace)/adf-parameters.dev.json'
+
+                    #csmParametersFile: '$(Pipeline.Workspace)/azure-pipelines/ArmTemplate/ARMTemplateParametersForFactory.json'
