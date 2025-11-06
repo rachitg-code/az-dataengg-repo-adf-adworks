@@ -25,9 +25,7 @@
     "Microsoft.DataFactory/factories/pipelines": {
         "properties": {
             "parameters": {
-                "p_test": {
-                    "defaultValue": "="
-                }
+                "p_test": "="
             }
         }
     },
