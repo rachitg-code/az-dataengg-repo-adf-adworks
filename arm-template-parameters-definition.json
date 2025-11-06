@@ -24,18 +24,8 @@
     },
     "Microsoft.DataFactory/factories/pipelines": {
         "properties": {
-            "activities": [
-                {
-                    "typeProperties": {
-                        "source": {
-                            "storedProcedureParameters": {
-                                "SourceSchema": "=",
-                                "SourceTable": "=:-St:String"
-                            }
-                        }
-                    }
-                }
-            ]
+            "parameters": {
+                "p_test": "="
         }
     },
     "Microsoft.DataFactory/factories/integrationRuntimes": {
