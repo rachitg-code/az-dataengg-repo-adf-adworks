@@ -26,6 +26,7 @@
         "properties": {
             "parameters": {
                 "p_test": "="
+            }
         }
     },
     "Microsoft.DataFactory/factories/integrationRuntimes": {
