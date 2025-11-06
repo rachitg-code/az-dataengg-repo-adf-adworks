@@ -68,6 +68,9 @@ stages:
           - script: |
               ls -R $(Pipeline.Workspace)
             displayName: 'debug'
+          - script: |
+              ls -l $(Build.Repository.LocalPath)/$(parameterFileName)
+            displayName: 'debug2'
           - task: CopyFiles@2
             inputs:
               SourceFolder: '$(Build.Repository.LocalPath)/$(parameterFileName)'
