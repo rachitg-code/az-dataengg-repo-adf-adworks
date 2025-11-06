@@ -73,7 +73,8 @@ stages:
             displayName: 'debug2'
           - task: CopyFiles@2
             inputs:
-              SourceFolder: '$(Build.Repository.LocalPath)/$(parameterFileName)'
+              SourceFolder: '$(Build.Repository.LocalPath)'
+              contents: '$(parameterFileName)'
               targetFolder: '$(Build.Repository.LocalPath)$(packagePath)/ArmTemplate'
           - task: PublishPipelineArtifact@1
             inputs:
