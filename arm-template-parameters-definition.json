@@ -27,13 +27,14 @@
             "parameters": {
                 "p_test": "=:-p_test"
             },
-            "activities": [
-                {
+            "activities": [{
                     "typeProperties": {
                         "source": {
-                            "SourceTable": "="
+                            "storedProcedureParameters": {
+                                "SourceTable": "="
                             }
                         }
+                    }
                 }
             ]
         }
