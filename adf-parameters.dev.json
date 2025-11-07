@@ -6,10 +6,7 @@
       "value": "adventureworks-22-proj-adf"
     },
     "pl_debug_v3_p_test": {
-        "value": {  
-            "type": "string",
-            "defaultValue": "test_Sc"
-        }
+        "value": "test_Sc"
     }
   }
 }
