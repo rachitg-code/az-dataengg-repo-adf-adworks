@@ -25,7 +25,7 @@
     "Microsoft.DataFactory/factories/pipelines": {
         "properties": {
             "parameters": {
-                "p_test": "=:-p_test:string"
+                "p_test": "=:-p_test"
             },
             "activities": [{
                     "typeProperties": {
