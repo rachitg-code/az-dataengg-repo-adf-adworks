@@ -7,7 +7,7 @@
     },
     "pl_debug_v3_p_test": {
         "type": "object",
-        "defaultValue": {
+        "value": {
             "type": "string",
             "defaultValue": "testSt3"
             }
