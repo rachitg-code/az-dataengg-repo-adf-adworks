@@ -6,7 +6,6 @@
       "value": "adventureworks-22-proj-adf"
     },
     "pl_debug_v3_p_test": {
-        "type": "object",
         "value": {
             "type": "string",
             "defaultValue": "testSt3"
