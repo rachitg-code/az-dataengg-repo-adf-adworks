@@ -1,5 +1,5 @@
 {
-	"name": "pl_debug_v2",
+	"name": "pl-debug-v2",
 	"properties": {
 		"activities": [
 			{
@@ -12,7 +12,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "pl_init_metad",
+						"referenceName": "pl-init-metad",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true,
