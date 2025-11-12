@@ -1,5 +1,5 @@
 {
-	"name": "pl-debug-v3",
+	"name": "pl-debug-arm-param-v3",
 	"properties": {
 		"activities": [
 			{
@@ -218,6 +218,9 @@
 				"type": "String",
 				"defaultValue": "TestRun"
 			}
+		},
+		"folder": {
+			"name": "Arch"
 		},
 		"annotations": [],
 		"lastPublishTime": "2025-10-23T09:12:41Z"
