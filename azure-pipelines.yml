@@ -65,12 +65,12 @@ stages:
           - script: |
               echo "SourceFolder: $(Build.Repository.LocalPath)/$(parameterFileName)"
             displayName: 'Sources Path'
-          - script: |
-              ls -R $(Pipeline.Workspace)
-            displayName: 'debug'
-          - script: |
-              ls -l $(Build.Repository.LocalPath)/$(parameterFileName)
-            displayName: 'debug2'
+          # - script: |
+          #     ls -R $(Pipeline.Workspace)
+          #   displayName: 'debug'
+          # - script: |
+          #     ls -l $(Build.Repository.LocalPath)/$(parameterFileName)
+          #   displayName: 'debug2'
           - task: CopyFiles@2
             inputs:
               SourceFolder: '$(Build.Repository.LocalPath)'
