@@ -1,5 +1,5 @@
 {
-	"name": "pl_init_metad-sql-wrapper",
+	"name": "pl-init-metad-sql-wrapper",
 	"properties": {
 		"activities": [
 			{

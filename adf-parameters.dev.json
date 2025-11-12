@@ -5,8 +5,10 @@
     "factoryName": {
       "value": "adventureworks-22-proj-adf"
     },
-    "pl_debug_v3_properties_parameters_p_test": {
-      "value": "test_Sc"
+    "pl_debug_v3_p_test": {
+        "value": {
+            "defaultValue": "testSt3"
+            }
+        }
     }
-  }
 }

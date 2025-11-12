@@ -659,7 +659,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "pl_init_metad",
+						"referenceName": "pl-init-metad",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true,

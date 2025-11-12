@@ -292,7 +292,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "pl_init_metad-sql-wrapper",
+						"referenceName": "pl-init-metad-sql-wrapper",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true
