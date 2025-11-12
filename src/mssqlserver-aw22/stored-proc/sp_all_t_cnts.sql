@@ -1,8 +1,9 @@
-IF OBJECT_ID('dbo.prc_all_t_cnts', 'P') IS NOT NULL
+IF OBJECT_ID('dbo.sp_all_t_cnts', 'P') IS NOT NULL
     DROP PROCEDURE dbo.sp_all_t_cnts;
 GO
 
 CREATE PROCEDURE dbo.sp_all_t_cnts 
+    @p_sort_flag INT = 1  -- 0=byName, 1=byCnt desc
 AS
 BEGIN
     DECLARE @Column1 INT, @Column2 NVARCHAR(50);
@@ -38,8 +39,8 @@ BEGIN
 
         SET @full_table_name = QUOTENAME(@table_schema) + '.' + QUOTENAME(@table_name);
 
-        print(@DynamicSQL)
-        print(@full_table_name)
+        print(@DynamicSQL);
+        print(@full_table_name);
         -- Execute the query with parameters
         
         INSERT INTO @Results (name, cnt)
@@ -55,6 +56,13 @@ BEGIN
      CLOSE myCursor;
      DEALLOCATE myCursor;
 
-     SELECT REPLACE(REPLACE(name, '[',''),']','') AS name, cnt FROM @Results ORDER BY cnt DESC,name;
 
-END
+    IF @p_sort_flag = 1 
+        BEGIN
+            SELECT REPLACE(REPLACE(name, '[',''),']','') AS name, cnt FROM @Results ORDER BY cnt DESC,name;
+        END
+    ELSE
+        BEGIN
+            SELECT REPLACE(REPLACE(name, '[',''),']','') AS name, cnt FROM @Results ORDER BY name;
+        END;
+END;
