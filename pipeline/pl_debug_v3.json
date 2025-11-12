@@ -104,7 +104,10 @@
 							},
 							"SourceSchema": {
 								"type": "String",
-								"value": null
+								"value": {
+									"value": "@pipeline().parameters.p_test",
+									"type": "Expression"
+								}
 							},
 							"SourceSystem": {
 								"type": "String",
@@ -183,6 +186,10 @@
 				"defaultValue": 0
 			},
 			"p_source_system": {
+				"type": "string",
+				"defaultValue": "test2"
+			},
+			"p_test": {
 				"type": "string",
 				"defaultValue": "test2"
 			}
